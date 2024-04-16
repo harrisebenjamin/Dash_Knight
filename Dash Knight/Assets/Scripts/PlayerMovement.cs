@@ -21,6 +21,8 @@ public class PlayerMovement : MonoBehaviour
     private float dashPower = 24f;
     private float dashTime = 0.2f;
     private float dashCooldown = 1f;
+    private float coyoteTime = 0.1f;
+    private float coyoteTimeCounter;
 
 
     [SerializeField] Transform groundCheck;
@@ -49,6 +51,16 @@ public class PlayerMovement : MonoBehaviour
         {
             return;
         }
+
+        if (IsGrounded())
+        {
+            coyoteTimeCounter = coyoteTime;
+        }
+        else
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
+        Debug.Log(coyoteTimeCounter);
 
         m_RigidBody.velocity = new Vector2(horizontal * moveSpeed, m_RigidBody.velocity.y);
     }
@@ -107,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!isDashing)
         {
-            if (context.performed && IsGrounded())
+            if (context.performed && coyoteTimeCounter > 0f)
             {
                 m_RigidBody.velocity = new Vector2(m_RigidBody.velocity.x, jumpForce);
             }
@@ -115,6 +127,7 @@ public class PlayerMovement : MonoBehaviour
             if (context.canceled && m_RigidBody.velocity.y > 0f)
             {
                 m_RigidBody.velocity = new Vector2(m_RigidBody.velocity.x, m_RigidBody.velocity.y * 0.5f);
+                coyoteTimeCounter = 0f;
             }
         }
     }
