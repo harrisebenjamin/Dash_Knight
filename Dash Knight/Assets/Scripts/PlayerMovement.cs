@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isFacingRight = true;
     private bool canDash = true;
     private bool isDashing = false;
-    private float dashPower = 24f;
+    private float dashPower = 10f;
     private float dashTime = 0.2f;
     private float dashCooldown = 1f;
     private float coyoteTime = 0.1f;
@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private TrailRenderer trail;
     [SerializeField] private AudioSource dashAudio;
     [SerializeField] private AudioSource coindAudio;
+
+    public Animator animator;
 
     // Start is called before the first frame update
     void Start()
@@ -63,6 +65,9 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log(coyoteTimeCounter);
 
         m_RigidBody.velocity = new Vector2(horizontal * moveSpeed, m_RigidBody.velocity.y);
+
+        animator.SetFloat("Speed", Mathf.Abs(horizontal));
+        animator.SetFloat("VerticalSpeed", m_RigidBody.velocity.y);
     }
 
     //Handles collision with enemies and coins
@@ -147,6 +152,7 @@ public class PlayerMovement : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
+        animator.SetBool("Dash", true);
         float originalGrav = m_RigidBody.gravityScale;
         m_RigidBody.gravityScale = 0f;
         m_RigidBody.velocity = new Vector2(transform.localScale.x * dashPower, 0f);
@@ -155,6 +161,7 @@ public class PlayerMovement : MonoBehaviour
         trail.emitting = false;
         m_RigidBody.gravityScale = originalGrav;
         isDashing = false;
+        animator.SetBool("Dash", false);
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
