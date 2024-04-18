@@ -8,6 +8,8 @@ public class EnemyMovement : MonoBehaviour
     public float speed = 0.003f;
     public float position = 1;
     public bool flip = true;
+    private bool isFacingRight = true;
+    private Rigidbody2D m_rigidBody;
 
     void FixedUpdate()
     {
@@ -23,10 +25,15 @@ public class EnemyMovement : MonoBehaviour
                 transform.Translate(-position * speed * Time.deltaTime, 0, 0);
             }
 
+            //Flip();
+
             if (frames == 60)
             {
                 frames = 0;
                 flip = !flip;
+                Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale;
             }
 
             frames++;
@@ -36,12 +43,24 @@ public class EnemyMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        m_rigidBody = GetComponent<Rigidbody2D>(); 
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    //Flips the players direction based on the direction of movement
+    private void Flip()
+    {
+        if (isFacingRight && m_rigidBody.velocity.x < 0f || !isFacingRight && m_rigidBody.velocity.x > 0f)
+        {
+            isFacingRight = !isFacingRight;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
+        }
     }
 }

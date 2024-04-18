@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isDashing = false;
     private float dashPower = 10f;
     private float dashTime = 0.2f;
-    private float dashCooldown = 1f;
+    private float dashCooldown = 5f;
     private float coyoteTime = 0.1f;
     private float coyoteTimeCounter;
 
@@ -86,14 +86,6 @@ public class PlayerMovement : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
         }
-
-        if(collision.gameObject.CompareTag(("Coin")))
-        {
-            playerScore += 50;
-            _UIManager.UpdateScore(playerScore);
-            coindAudio.Play();
-            Destroy(collision.gameObject);
-        }
         
     }
 
@@ -104,7 +96,16 @@ public class PlayerMovement : MonoBehaviour
         {
             _UIManager.ShowWinText();
         }
+
+        if (other.CompareTag(("Coin")))
+        {
+            playerScore += 50;
+            _UIManager.UpdateScore(playerScore);
+            coindAudio.Play();
+            Destroy(other.gameObject);
+        }
     }
+
 
     //Gets the horizontal velocity from the user input
     public void Move(InputAction.CallbackContext context)
@@ -153,6 +154,7 @@ public class PlayerMovement : MonoBehaviour
         canDash = false;
         isDashing = true;
         animator.SetBool("Dash", true);
+        Dash_Bar.instance.Dash();
         float originalGrav = m_RigidBody.gravityScale;
         m_RigidBody.gravityScale = 0f;
         m_RigidBody.velocity = new Vector2(transform.localScale.x * dashPower, 0f);
@@ -162,6 +164,7 @@ public class PlayerMovement : MonoBehaviour
         m_RigidBody.gravityScale = originalGrav;
         isDashing = false;
         animator.SetBool("Dash", false);
+        Dash_Bar.instance.Recharge();
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
